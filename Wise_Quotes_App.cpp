@@ -7,14 +7,17 @@
 
 
 void display_quotes(std::ifstream& in_file);
-void add_quotes(std::ofstream& out_file);
+void add_quotes(std::ofstream& out_file, std::ifstream& in_file);
 void display_menu(std::ofstream& out_file, std::ifstream& in_file);
+void edit_quote(std::ofstream& out_file, std::ifstream& in_file);
+void delete_quote(std::ofstream& out_file, std::ifstream& in_file);
+void delete_quote(std::ofstream& out_file, std::ifstream& in_file);
 void quit();
 char option;
 
 int main()
 {
-    std::cout << "***************************Welcome to The Wise Quotes App***************************************\n";
+    std::cout << "\t\t***************************Welcome to The Wise Quotes App***************************************\n";
     std::ofstream out_file;
     std::ifstream in_file;
    
@@ -24,48 +27,67 @@ int main()
 
 void display_quotes(std::ifstream &in_file) {
     system("CLS");
-    char c;
+    
+    int quote_no{0};
+    std::string quote;
+    std::string author;
+    std::string date;
+    std::string word;
+
     in_file.open("quotes.txt");
 
-    if (in_file.is_open()) {
-        std::cout << "\t\t\tThese are your available quotes\n";
-        while (in_file.get(c)) {
-            std::cout << c;
-        }
+    if (!in_file) {
+        std::cout << "You have no quotes available yet!\n" << std::endl << std::endl;
     }
-    
+
+        std::cout << "\t\t\tThese are your available quotes\n";
+        while (in_file>>word) {
+
+           
+            getline(in_file, quote);
+            std::cout << "\nQuote-"<<quote_no<<": " << word << quote << std::endl;
+            quote_no++;
+            getline(in_file, author);
+            std::cout << "By: " << author << std::endl;
+            getline(in_file, date);
+            std::cout << "Date: " << date << std::endl;
+        }
     in_file.close();
 }
 
-void add_quotes(std::ofstream &out_file) {
+void add_quotes(std::ofstream &out_file, std::ifstream &in_file) {
+
     system("CLS");
     out_file.open("quotes.txt", std::ios::app);
+    
 
     if (out_file.is_open()) {
         std::string date;
         std::string quote;
         std::string author;
+        int quote_no{1};
         int count{ 0 };
 
-        std::cout << "How many quotes would you like to add today?: ";
-        std::cin >> count;
 
-        for (int i{ 1 }; i <= count;i++) {
-            std::cout << "Quote " << i << ":" << std::endl;
-            std::cin.ignore(1, '\n');
+           std::cin.ignore(1, '\n');
+            std::cout << "Quote: ";
             std::getline(std::cin, quote);
-            out_file << "Quote: " << quote << std::endl;
+            out_file << quote << std::endl;
+          
 
             std::cout << "Author: ";
             std::getline(std::cin, author);
-            out_file << "by " << author << std::endl;
+            out_file << author << std::endl;
+         
 
             std::cout << "Date: ";
             std::getline(std::cin, date);
-            out_file << "Date: " << date << std::endl << std::endl;
+            out_file << date << std::endl;
 
-            std::cout << "Quote successfully added! " << std::endl;
-        }
+
+
+            std::cout << "Quote successfully added! " << std::endl << std::endl;
+        
     }
     out_file.close();
 
@@ -73,19 +95,31 @@ void add_quotes(std::ofstream &out_file) {
 
 void display_menu(std::ofstream &out_file, std::ifstream &in_file) {
     if (option != '0') {
-        std::cout << "1 - Add a Quote\n2 - View all Quotes\n0 - Quit the app\nChoice: ";
+        std::cout << "\n\n1 - Add Quotes\n2 - View all Quotes\n3 - Edit A Quote\n4 - Delete a Quote\n0 - Quit the app\n===============================================================================================\nChoice: ";
         std::cin >> option;
 
         switch (option) {
         case '1':
         {
-            add_quotes(out_file);
+            add_quotes(out_file,in_file);
             display_menu(out_file, in_file);
         }
         break;
         case '2':
         {
             display_quotes(in_file);
+            display_menu(out_file, in_file);
+        }
+        break;
+        case '3':
+        {
+            edit_quote(out_file,in_file);
+            display_menu(out_file, in_file);
+        }
+        break;
+        case '4':
+        {
+            delete_quote(out_file, in_file);
             display_menu(out_file, in_file);
         }
         break;
@@ -105,12 +139,133 @@ void display_menu(std::ofstream &out_file, std::ifstream &in_file) {
     }
 }
 
+void edit_quote(std::ofstream& out_file, std::ifstream& in_file) {
+    system("CLS");
+    int quote_no{};
+    int count{ 0 };
+
+    std::string quote_temp;
+    std::string author_temp;
+    std::string date_temp;
+
+    std::string quote;
+    std::string author;
+    std::string date;
+
+    std::string word;
+
+    display_quotes(in_file);
+
+    in_file.open("quotes.txt");
+
+    std::cout << "What quote do you want to edit?\nOption: " << std::endl;
+    std::cin >> quote_no;
+
+    out_file.open("temp.txt");
+    while (in_file>>word) {
+        if (count != quote_no) {
+            getline(in_file, quote);
+            out_file<<" " << word << quote << std::endl;
+
+            getline(in_file, author);
+            out_file << author<< std::endl;
+
+            getline(in_file, date);
+            out_file << date<< std::endl;
+        }
+        else {
+            std::cout << "Quote to be edited: " << std::endl;
+            getline(in_file, quote);
+            getline(in_file, author);
+            getline(in_file, date);
+            
+            std::cout << "Quote: " <<word<< quote << std::endl;
+            std::cout << "Author: " << author << std::endl;
+            std::cout << "Date: " << date << std::endl;
+
+
+
+            std::cin.ignore(1, '\n');
+            std::cout <<std::endl<<std::endl<< "New Quote: ";
+            getline(std::cin, quote_temp);
+            out_file << quote_temp<<std::endl;
+
+            std::cout << "New Author: ";
+            getline(std::cin, author_temp);
+            out_file << author_temp<<std::endl;
+
+            std::cout << "New Date: ";
+            getline(std::cin, date_temp);
+            out_file << date_temp << std::endl;
+        }
+        count++;
+    }
+    std::cout << "Quote successfully edited!" << std::endl;
+    in_file.close();
+    out_file.close();
+    remove("quotes.txt");
+    rename("temp.txt", "quotes.txt");
+    
+}
+
+void delete_quote(std::ofstream& out_file, std::ifstream& in_file) {
+    system("CLS");
+    int quote_no{};
+    int count{ 0 };
+
+    std::string quote_temp;
+    std::string author_temp;
+    std::string date_temp;
+
+    std::string quote;
+    std::string author;
+    std::string date;
+
+    std::string word;
+
+    display_quotes(in_file);
+
+    in_file.open("quotes.txt");
+
+    std::cout << "What quote do you want to delete?\nOption: " << std::endl;
+    std::cin >> quote_no;
+
+    out_file.open("temp.txt");
+    while (in_file >> word) {
+        if (count != quote_no) {
+            getline(in_file, quote);
+            out_file << " " << word << quote << std::endl;
+
+            getline(in_file, author);
+            out_file << author << std::endl;
+
+            getline(in_file, date);
+            out_file << date << std::endl;
+        }
+        else {
+            getline(in_file, quote);
+            getline(in_file, author);
+            getline(in_file, date);
+        }
+        count++;
+    }
+    std::cout << "Quote successfully deleted!" << std::endl;
+    in_file.close();
+    out_file.close();
+    remove("quotes.txt");
+    rename("temp.txt", "quotes.txt");
+}
+
 void quit() {
     system("CLS");
-    std::cout << "Good-Bye\t\tYour quotes are save with us";
+    std::cout << "Good-Bye\t\tYour quotes are save with us\n\n\n";
     option = '0';
 
 }
+
+
+
+
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
 // Debug program: F5 or Debug > Start Debugging menu
 
