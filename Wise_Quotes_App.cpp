@@ -4,6 +4,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
+
 
 
 void display_quotes(std::ifstream& in_file);
@@ -20,8 +22,7 @@ int main()
     std::cout << "\t\t***************************Welcome to The Wise Quotes App***************************************\n";
     std::ofstream out_file;
     std::ifstream in_file;
-   
-    display_menu(out_file, in_file);
+       display_menu(out_file, in_file);
     return 0;
 }
 
@@ -65,20 +66,44 @@ void add_quotes(std::ofstream &out_file, std::ifstream &in_file) {
         std::string date;
         std::string quote;
         std::string author;
-        int quote_no{1};
+        bool done = false;
+        std::string quote_no{  };
+        int quote_no_value{};
         int count{ 0 };
 
+        //Data Validation---------------->
+        while(!done){
+            std::cout << "\nHow many quotes would you like to add?: ";
+            std::cin >> quote_no;
+            std::istringstream validator{ quote_no };
 
-           std::cin.ignore(1, '\n');
+            if (validator >> quote_no_value) {
+                done = true;
+            }
+
+            else {
+                std::cout << "Kindly enter an integer";
+                std::cin.ignore(std::numeric_limits <std::streamsize> ::max(), '\n');
+            } 
+        }
+        
+
+        for (int i{ 0 }; i < quote_no_value; i++) {
+            std::cout << std::endl << "Quote " << i + 1 << std::endl;
+           
+            if (i==0) 
+            std::cin.ignore(1, '\n');
+        
+
             std::cout << "Quote: ";
             std::getline(std::cin, quote);
             out_file << quote << std::endl;
-          
+
 
             std::cout << "Author: ";
             std::getline(std::cin, author);
             out_file << author << std::endl;
-         
+
 
             std::cout << "Date: ";
             std::getline(std::cin, date);
@@ -86,8 +111,8 @@ void add_quotes(std::ofstream &out_file, std::ifstream &in_file) {
 
 
 
-            std::cout << "Quote successfully added! " << std::endl << std::endl;
-        
+            std::cout << "Quote successfully added! " << std::endl;
+        }
     }
     out_file.close();
 
@@ -143,23 +168,32 @@ void edit_quote(std::ofstream& out_file, std::ifstream& in_file) {
     system("CLS");
     int quote_no{};
     int count{ 0 };
-
     std::string quote_temp;
     std::string author_temp;
     std::string date_temp;
-
     std::string quote;
     std::string author;
     std::string date;
-
     std::string word;
+    std::string entry{};
+    bool done = false;
 
     display_quotes(in_file);
 
     in_file.open("quotes.txt");
-
-    std::cout << "What quote do you want to edit?\nOption: " << std::endl;
-    std::cin >> quote_no;
+    //Data Validation-------->
+    do {
+        std::cout << "What quote do you want to edit?\nOption: " << std::endl;
+        std::cin >> entry;
+        std::istringstream validator{ entry };
+        if (validator >> quote_no) {
+            done = true;
+        }
+        else {
+            std::cout << "Kindly enter an integer" << std::endl;
+            std::cin.ignore(std::numeric_limits <std::streamsize> ::max(), '\n');
+        }
+    } while (!done);
 
     out_file.open("temp.txt");
     while (in_file>>word) {
@@ -220,15 +254,27 @@ void delete_quote(std::ofstream& out_file, std::ifstream& in_file) {
     std::string quote;
     std::string author;
     std::string date;
-
     std::string word;
+    std::string entry{};
+    bool done = false;
 
     display_quotes(in_file);
 
     in_file.open("quotes.txt");
 
-    std::cout << "What quote do you want to delete?\nOption: " << std::endl;
-    std::cin >> quote_no;
+    do {
+        std::cout << "What quote do you want to delete?\nOption: " << std::endl;
+        std::cin >> entry;
+
+        std::istringstream validator{ entry };
+        if (validator >> quote_no) {
+            done = true;
+        }
+        else {
+            std::cout << "Kindly enter an integer" << std::endl;
+            std::cin.ignore(std::numeric_limits <std::streamsize> ::max(), '\n');
+        }
+    } while (!done);
 
     out_file.open("temp.txt");
     while (in_file >> word) {
